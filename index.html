@@ -10,7 +10,25 @@
 				const urlParams = new URLSearchParams(window.location.search);
 				const url = urlParams.get('url');
 				if (url) {
-					window.location.href = decodeURIComponent(url);
+					// Open the URL in a new window/tab
+					const newWindow = window.open(decodeURIComponent(url), '_blank');
+
+					// Make sure the new window was successfully opened before closing this one
+					if (newWindow) {
+						// Close the current window
+						window.close();
+
+						// If window.close() doesn't work (which can happen due to browser security restrictions),
+						// update the content to inform the user they can close this tab
+						setTimeout(function () {
+							document.body.innerHTML =
+								'<h2>Redirect opened in new tab. You can close this tab.</h2>';
+						}, 1000);
+					} else {
+						// If popup was blocked, inform the user
+						document.body.innerHTML =
+							'<h2>Popup blocked. Please allow popups and try again.</h2>';
+					}
 				} else {
 					document.body.innerHTML = '<h2>No redirect URL provided.</h2>';
 				}
