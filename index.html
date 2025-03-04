@@ -4,16 +4,18 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Redirecting...</title>
-		<!-- 		<script>
+		<script>
 			window.onload = function () {
-				const url = decodeURIComponent(window.location.pathname.substring(1));
+				// Get URL from query parameter instead of pathname
+				const urlParams = new URLSearchParams(window.location.search);
+				const url = urlParams.get('url');
 				if (url) {
-					window.location.href = url;
+					window.location.href = decodeURIComponent(url);
 				} else {
 					document.body.innerHTML = '<h2>No redirect URL provided.</h2>';
 				}
 			};
-		</script> -->
+		</script>
 	</head>
 	<body>
 		<p>Redirecting...</p>
