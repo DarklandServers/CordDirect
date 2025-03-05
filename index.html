@@ -3,39 +3,153 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Redirecting...</title>
+		<title>URL Redirect Tool</title>
+		<style>
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 20px;
+				line-height: 1.5;
+				background-color: #121212;
+				color: #f0f0f0;
+			}
+			.container {
+				margin-top: 20px;
+			}
+			.input-group {
+				display: flex;
+				margin-bottom: 20px;
+			}
+			input {
+				flex: 1;
+				padding: 8px 12px;
+				border: 1px solid #333;
+				border-radius: 4px;
+				background-color: #1e1e1e;
+				color: #f0f0f0;
+				margin-right: 8px;
+			}
+			button {
+				padding: 8px 12px;
+				background-color: #333;
+				color: #f0f0f0;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: #444;
+			}
+			.result-box {
+				margin-top: 20px;
+				display: none;
+			}
+			.copy-box {
+				padding: 10px;
+				background-color: #1e1e1e;
+				border: 1px solid #333;
+				border-radius: 4px;
+				margin-bottom: 10px;
+				word-break: break-all;
+			}
+			.redirect-message {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #000;
+				background-color: #fff;
+				z-index: 1000;
+			}
+		</style>
 		<script>
 			window.onload = function () {
 				// Get URL from query parameter instead of pathname
 				const urlParams = new URLSearchParams(window.location.search);
 				const url = urlParams.get('url');
 				if (url) {
-					// Open the URL in a new window/tab
-					const newWindow = window.open(decodeURIComponent(url), '_blank');
+					// Show redirecting message only when actually redirecting
+					document.getElementById('redirect-message').style.display = 'flex';
 
-					// Make sure the new window was successfully opened before closing this one
-					if (newWindow) {
-						// Close the current window
-						window.close();
-
-						// If window.close() doesn't work (which can happen due to browser security restrictions),
-						// update the content to inform the user they can close this tab
-						setTimeout(function () {
-							document.body.innerHTML =
-								'<h2>Redirect opened in new tab. You can close this tab.</h2>';
-						}, 1000);
-					} else {
-						// If popup was blocked, inform the user
-						document.body.innerHTML =
-							'<h2>Popup blocked. Please allow popups and try again.</h2>';
-					}
+					// Add a small delay before redirecting
+					setTimeout(() => {
+						window.location.href = decodeURIComponent(url);
+					}, 1000);
 				} else {
-					document.body.innerHTML = '<h2>No redirect URL provided.</h2>';
+					// Hide redirecting message and show the URL input form
+					document.getElementById('redirect-message').style.display = 'none';
+					document.getElementById('redirect-form').style.display = 'block';
 				}
 			};
+
+			function generateRedirectUrl() {
+				const inputUrl = document.getElementById('url-input').value.trim();
+				if (!inputUrl) {
+					alert('Please enter a URL');
+					return;
+				}
+
+				// Validate URL format
+				try {
+					new URL(inputUrl);
+				} catch (e) {
+					alert('Please enter a valid URL (include http:// or https://)');
+					return;
+				}
+
+				const encodedUrl = encodeURIComponent(inputUrl);
+				const currentUrl = window.location.href.split('?')[0];
+				const redirectUrl = `${currentUrl}?url=${encodedUrl}`;
+
+				// Display the result
+				document.getElementById('result-box').style.display = 'block';
+				document.getElementById('redirect-url').textContent = redirectUrl;
+			}
+
+			function copyToClipboard() {
+				const redirectUrl = document.getElementById('redirect-url').textContent;
+				navigator.clipboard
+					.writeText(redirectUrl)
+					.then(() => {
+						const copyButton = document.getElementById('copy-button');
+						const originalText = copyButton.textContent;
+						copyButton.textContent = 'Copied';
+						setTimeout(() => {
+							copyButton.textContent = originalText;
+						}, 2000);
+					})
+					.catch((err) => {
+						console.error('Failed to copy: ', err);
+						alert('Failed to copy to clipboard');
+					});
+			}
 		</script>
 	</head>
 	<body>
-		<p>Redirecting...</p>
+		<div id="redirect-message" class="redirect-message" style="display: none">
+			<p>Redirecting...</p>
+		</div>
+
+		<div id="redirect-form" class="container" style="display: none">
+			<h2>URL Redirect Tool</h2>
+			<p>Enter a URL to generate a redirect link:</p>
+
+			<div class="input-group">
+				<input type="text" id="url-input" placeholder="https://example.com" />
+				<button onclick="generateRedirectUrl()">Generate</button>
+			</div>
+
+			<div id="result-box" class="result-box">
+				<p>Your redirect link:</p>
+				<div class="copy-box" id="redirect-url"></div>
+				<button id="copy-button" onclick="copyToClipboard()">Copy</button>
+			</div>
+		</div>
 	</body>
 </html>
