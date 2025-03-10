@@ -3,153 +3,88 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>URL Redirect Tool</title>
-		<style>
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-					sans-serif;
-				max-width: 600px;
-				margin: 0 auto;
-				padding: 20px;
-				line-height: 1.5;
-				background-color: #121212;
-				color: #f0f0f0;
-			}
-			.container {
-				margin-top: 20px;
-			}
-			.input-group {
-				display: flex;
-				margin-bottom: 20px;
-			}
-			input {
-				flex: 1;
-				padding: 8px 12px;
-				border: 1px solid #333;
-				border-radius: 4px;
-				background-color: #1e1e1e;
-				color: #f0f0f0;
-				margin-right: 8px;
-			}
-			button {
-				padding: 8px 12px;
-				background-color: #333;
-				color: #f0f0f0;
-				border: none;
-				border-radius: 4px;
-				cursor: pointer;
-			}
-			button:hover {
-				background-color: #444;
-			}
-			.result-box {
-				margin-top: 20px;
-				display: none;
-			}
-			.copy-box {
-				padding: 10px;
-				background-color: #1e1e1e;
-				border: 1px solid #333;
-				border-radius: 4px;
-				margin-bottom: 10px;
-				word-break: break-all;
-			}
-			.redirect-message {
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				color: #000;
-				background-color: #fff;
-				z-index: 1000;
-			}
-		</style>
-		<script>
-			window.onload = function () {
-				// Get URL from query parameter instead of pathname
-				const urlParams = new URLSearchParams(window.location.search);
-				const url = urlParams.get('url');
-				if (url) {
-					// Show redirecting message only when actually redirecting
-					document.getElementById('redirect-message').style.display = 'flex';
-
-					// Add a small delay before redirecting
-					setTimeout(() => {
-						window.location.href = decodeURIComponent(url);
-					}, 1000);
-				} else {
-					// Hide redirecting message and show the URL input form
-					document.getElementById('redirect-message').style.display = 'none';
-					document.getElementById('redirect-form').style.display = 'block';
-				}
-			};
-
-			function generateRedirectUrl() {
-				const inputUrl = document.getElementById('url-input').value.trim();
-				if (!inputUrl) {
-					alert('Please enter a URL');
-					return;
-				}
-
-				// Validate URL format
-				try {
-					new URL(inputUrl);
-				} catch (e) {
-					alert('Please enter a valid URL (include http:// or https://)');
-					return;
-				}
-
-				const encodedUrl = encodeURIComponent(inputUrl);
-				const currentUrl = window.location.href.split('?')[0];
-				const redirectUrl = `${currentUrl}?url=${encodedUrl}`;
-
-				// Display the result
-				document.getElementById('result-box').style.display = 'block';
-				document.getElementById('redirect-url').textContent = redirectUrl;
-			}
-
-			function copyToClipboard() {
-				const redirectUrl = document.getElementById('redirect-url').textContent;
-				navigator.clipboard
-					.writeText(redirectUrl)
-					.then(() => {
-						const copyButton = document.getElementById('copy-button');
-						const originalText = copyButton.textContent;
-						copyButton.textContent = 'Copied';
-						setTimeout(() => {
-							copyButton.textContent = originalText;
-						}, 2000);
-					})
-					.catch((err) => {
-						console.error('Failed to copy: ', err);
-						alert('Failed to copy to clipboard');
-					});
-			}
-		</script>
+		<title>URL Redirect Generator</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="style.css" />
 	</head>
-	<body>
-		<div id="redirect-message" class="redirect-message" style="display: none">
-			<p>Redirecting...</p>
+	<body class="bg-gray-900 min-h-screen relative overflow-hidden scanline">
+		<!-- URL Generator Section -->
+		<div id="generator" class="container mx-auto px-4 py-8 max-w-2xl">
+			<h1
+				class="retro-font text-2xl font-bold text-center mb-8 text-white animate-pulse"
+			>
+				URL REDIRECT GENERATOR
+			</h1>
+
+			<div
+				class="bg-gray-800 rounded-lg p-6 border-4 border-purple-500 pixel-border"
+			>
+				<div class="mb-6">
+					<label
+						for="originalUrl"
+						class="retro-font block text-sm text-green-400 mb-2"
+						>ENTER YOUR URL:</label
+					>
+					<input
+						type="text"
+						id="originalUrl"
+						class="w-full px-3 py-2 bg-black border-2 border-green-500 rounded-none text-green-400 placeholder-green-700 retro-font text-sm"
+						placeholder="TYPE URL HERE..."
+					/>
+				</div>
+
+				<button
+					id="generateBtn"
+					class="w-full bg-purple-600 text-white py-3 retro-font text-sm border-b-4 border-purple-800 hover:bg-purple-700 active:border-b-0 active:mt-1 mb-4 transition-all"
+				>
+					GENERATE REDIRECT URL
+				</button>
+
+				<div id="resultContainer" class="hidden">
+					<label class="retro-font block text-sm text-green-400 mb-2"
+						>GENERATED REDIRECT URL:</label
+					>
+					<div class="flex gap-2">
+						<input
+							type="text"
+							id="redirectUrl"
+							readonly
+							class="flex-1 px-3 py-2 bg-black border-2 border-green-500 rounded-none text-green-400 retro-font text-sm"
+						/>
+						<button
+							id="copyBtn"
+							class="bg-green-600 px-4 text-white retro-font text-sm border-b-4 border-green-800 hover:bg-green-700 active:border-b-0 active:translate-y-1 transition-all"
+						>
+							COPY
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
-		<div id="redirect-form" class="container" style="display: none">
-			<h2>URL Redirect Tool</h2>
-			<p>Enter a URL to generate a redirect link:</p>
-
-			<div class="input-group">
-				<input type="text" id="url-input" placeholder="https://example.com" />
-				<button onclick="generateRedirectUrl()">Generate</button>
-			</div>
-
-			<div id="result-box" class="result-box">
-				<p>Your redirect link:</p>
-				<div class="copy-box" id="redirect-url"></div>
-				<button id="copy-button" onclick="copyToClipboard()">Copy</button>
+		<!-- Redirect Handler Section -->
+		<div
+			id="redirect"
+			class="hidden fixed inset-0 bg-black items-center justify-center"
+		>
+			<div class="text-center">
+				<div
+					id="pixelContainer"
+					class="absolute inset-0 pointer-events-none"
+				></div>
+				<p class="text-white text-xl retro-font loading-text">
+					WARPING TO DESTINATION
+				</p>
+				<p class="text-green-500 text-sm retro-font mt-4">
+					PRESS START TO SKIP
+				</p>
 			</div>
 		</div>
+
+		<script src="script.js"></script>
 	</body>
 </html>
