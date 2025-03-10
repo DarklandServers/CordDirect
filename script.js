@@ -1,5 +1,8 @@
 let audioContext = null;
 
+// Configuration constants
+const REDIRECT_COUNTDOWN_SECONDS = 5;
+
 // Initialize audio context on first user interaction
 function initAudio() {
 	if (!audioContext) {
@@ -87,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		countdownEl.className =
 			'text-yellow-400 text-2xl retro-font mb-4 countdown';
 		countdownEl.id = 'countdown';
-		countdownEl.textContent = '5';
+		countdownEl.textContent = REDIRECT_COUNTDOWN_SECONDS.toString();
 
 		// Insert countdown before the "WARPING TO DESTINATION" text
 		const loadingText = document.querySelector('.loading-text');
@@ -97,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		const skipText = document.querySelector('.text-green-500');
 		skipText.textContent = 'PRESS START TO SKIP';
 
-		let countdownValue = 5;
+		let countdownValue = REDIRECT_COUNTDOWN_SECONDS;
 		let countdownInterval;
 		let redirectTimeout;
 
@@ -118,7 +121,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			// Set timeout for redirect
 			redirectTimeout = setTimeout(() => {
 				window.location.href = redirectUrl;
-			}, 5000);
+			}, REDIRECT_COUNTDOWN_SECONDS * 1000);
 		};
 
 		// Allow skipping the animation with any key press (not clicks)
